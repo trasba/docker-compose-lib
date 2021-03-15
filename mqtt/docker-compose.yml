@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+    web:
+        image: eclipse-mosquitto:2.0.9-openssl ###last known working version (tag) 2.0.9 210313 2.0.5 210127
+        container_name: mqtt
+        volumes:
+          - ./data:/mosquitto/data
+          - ./config:/mosquitto/config
+          - ./log:/mosquitto/log
+        restart: always
+        environment:
+          - TZ=${TZ}
