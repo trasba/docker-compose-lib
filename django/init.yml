@@ -1,18 +1,20 @@
 # run with docker-compose -f init.yml
 # init django docker container, this will:
+# * init a django project with ${app} in folder /app
 # * copy the /app folder to the local files system
-# * finally you can run the docker-compose command
+# * finally you can run the docker-compose up -d command
 version: '3.7'
 
 services:
   app:
     image: trasba/django:3.1.7 # as of 210326
+    user: root:root
     build:
       context: .
     ports:
       - "8000:8000"
     volumes:
-      - ./app:/tmp1
-    command: sh -c "cp /app/* /tmp1 -r"
+      - ./app:/${app}
+    command: sh -c "cd / && django-admin startproject "${app}" /"${app}
     environment:
       - DEBUG=1
