@@ -1,0 +1,14 @@
+version: '3.7'
+
+services:
+  app:
+    image: gogs/gogs:0.12.3 # as of 210327
+    container_name: gogs
+    ports:
+      - "10080:3000"
+      - "10022:22"
+    volumes:
+      - ./data:/data
+    restart: always
+    environment:
+      - TZ=${TZ}
