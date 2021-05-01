@@ -1,3 +1,15 @@
 .env
-/django/app
 .vscode
+
+# app folders
+/calibre-web/config
+/calibre-web/books
+/swag/config
+/django/app
+/pypi-arm/pip
+/pypi-arm/build
+/gogs/data
+/grafana/data
+/wiki_js/data
+/prometheus/data
+/prometheus/node-exporter
