@@ -5,7 +5,7 @@ services:
     image: jupyter/base-notebook:latest # 231108
     container_name: jupyter
     volumes:
-      - ~/.trasba/docker/jupyter:/home/jovyan/work
+      - ~/.trasba/docker/jupyter:/home/jovyan
       - "/etc/localtime:/etc/localtime:ro"
     restart: unless-stopped
     # traefik network
