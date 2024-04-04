@@ -1,0 +1,127 @@
+---
+version: "3.9"
+
+networks:
+  net:
+    driver: bridge
+    # ipv6 possibly for tracking remote ip (at least when only ipv6 is public) TODO investigate further
+    # enable_ipv6: true
+
+services:
+  traefik:
+    image: traefik
+    container_name: traefik
+    volumes:
+      # make cert persistant
+      - ~/.trasba/docker/traefik:/etc/traefik
+      - /var/run/docker.sock:/var/run/docker.sock
+      # force host timezone
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    networks:
+      # traefik network in other containers use traefik_net
+      - net
+    labels:
+      # api
+      - "traefik.enable=true"
+      # host will be the address for the traefik dashboard
+      - "traefik.http.routers.api.rule=Host(`traefik.${DOMAIN}`)"
+      - "traefik.http.routers.api.entrypoints=https"
+      - "traefik.http.routers.api.service=api@internal"
+        # wildcard cert
+      - "traefik.http.routers.api.tls=true"
+      - "traefik.http.routers.api.tls.domains[0].main=${DOMAIN}"
+      - "traefik.http.routers.api.tls.domains[0].sans=*.${DOMAIN}"
+      - "traefik.http.routers.api.tls.certresolver=letsencrypt"
+      # if global middleware is deactivated this can be used individually in every container
+      # - "traefik.http.routers.api.middlewares=traefik-forward-auth@docker"
+    ports:
+      - 80:80
+      - 443:443
+    command:
+      # global
+      - "--api=true"
+      - "--log=true"
+      - "--log.level=INFO" #use DEBUG for debugging
+      # docker
+      - "--providers.docker=true"
+      - "--providers.docker.exposedByDefault=false"
+      # entrypoints
+      # define http (80) as entrypoint
+      - "--entrypoints.http=true"
+      - "--entrypoints.http.address=:80"
+      # redirect http -> https (globally)
+      - "--entrypoints.http.http.redirections.entrypoint.to=https"
+      - "--entrypoints.http.http.redirections.entrypoint.scheme=https"
+      # define https (443) as entrypoint
+      - "--entrypoints.https=true"
+      - "--entrypoints.https.address=:443"
+      - "--entrypoints.https.http.tls=true"
+      # letsencrapt
+      - "--certificatesResolvers.letsencrypt.acme.email=${ACME_EMAIL}"
+      - "--certificatesResolvers.letsencrypt.acme.storage=/etc/traefik/acme.json"
+      # - "--certificatesResolvers.letsencrypt.acme.httpChallenge.entryPoint=http"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=${ACME_PROVIDER}"
+      # define resolver 1.1.1.1 (cloudflare is 1.1.1.1) for fast propagation
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=${ACME_RESOLVER}"
+      # for testing use staging server to not get bocked
+      # - "--certificatesResolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      # global auth redirect (when activated all routes will go through this middleware)
+      - "--entrypoints.https.http.middlewares=traefik-forward-auth@docker"
+
+    environment:
+      # necessary for cloudflare dns challenge
+      - CLOUDFLARE_EMAIL=${CLOUDFLARE_EMAIL}
+      - CLOUDFLARE_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
+
+    # Specify restart policy
+    restart: unless-stopped
+
+  traefik-forward-auth:
+    # seems to be the most recent multiarch build (at least arm64 and amd64)
+    image: ghcr.io/jordemort/traefik-forward-auth
+    container_name: traefik-forward-auth
+    environment:
+      # google oauth credentials
+      - PROVIDERS_GOOGLE_CLIENT_ID=${PROVIDERS_GOOGLE_CLIENT_ID}
+      - PROVIDERS_GOOGLE_CLIENT_SECRET=${PROVIDERS_GOOGLE_CLIENT_SECRET}
+      # secrect for internal encryption
+      - SECRET=${SECRET}
+      # - UID=${PUID}
+      # - GID=${PGID}
+      # - INSECURE_COOKIE=true #TODO is it necessary?
+      - COOKIE_DOMAIN=${DOMAIN}
+      - AUTH_HOST=auth.${DOMAIN}
+    networks:
+      - net
+    command:
+      # global
+      - "--whitelist=${WHITELIST_MAIL}"
+      # rules
+      # - "--rule.public.action=allow"
+      # - "--rule.public.rule=Host(`public.${DOMAIN}`)"
+      # - "--rule.sec.action=auth"
+      # - "--rule.sec.rule=Host(`secure.${DOMAIN}`)"
+      # - "--rule.sec.whitelist=${WHITELIST_MAIL}"
+      # - "--log-level=debug"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik-forward-auth.entrypoints=https"
+      - "traefik.http.routers.traefik-forward-auth.tls=true"
+      - "traefik.http.routers.traefik-forward-auth.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.traefik-forward-auth.rule=Host(`auth.${WHITELIST_MAIL}`)"
+      # if global middleware is deactivated this can be used individually in every container
+      # - "traefik.http.routers.traefik-forward-auth.middlewares=traefik-forward-auth@docker"
+      - "traefik.http.middlewares.traefik-forward-auth.forwardauth.address=http://traefik-forward-auth:4181"
+      - "traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders=X-Forwarded-User"
+      - "traefik.http.middlewares.traefik-forward-auth.forwardauth.trustForwardHeader=true"
+      - "traefik.http.services.traefik-forward-auth.loadbalancer.server.port=4181"
+
+    # Specify restart policy
+    restart: unless-stopped
+
+    # for pialert
+    # extra_hosts:
+    # - host.docker.internal:172.17.0.1

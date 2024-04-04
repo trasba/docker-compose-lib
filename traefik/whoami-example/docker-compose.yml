@@ -1,0 +1,21 @@
+# example conf to run service in combination with traefik
+version: "3"
+services:
+  dashy:
+    container_name: whoami
+    image: traefik/whoami:latest
+    restart: unless-stopped
+    # add traefik functionality
+    networks:
+      - net
+    labels:
+      # traefik labels
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`${HOST}`)"
+      - "traefik.http.routers.whoami.entrypoints=https"
+
+networks:
+  # the network has to match the traefik network
+  net:
+    name: ${NET}
+    external: true
