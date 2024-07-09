@@ -1,0 +1,14 @@
+services:
+  homebridge:
+    image: homebridge/homebridge:latest #lastest known working version
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - TZ=${TZ}
+      - PGID=${GID}
+      - PUID=${UID}
+      - HOMEBRIDGE_CONFIG_UI_PORT=${CONFIG_UI_PORT}
+      - HOMEBRIDGE_CONFIG_UI=1
+      - HOMEBRIDGE_INSECURE=1
+    volumes:
+      - $HOME/.trasba/docker/homebridge/data:/homebridge
