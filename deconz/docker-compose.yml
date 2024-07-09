@@ -1,0 +1,23 @@
+services:
+  deconz:
+    image: deconzcommunity/deconz #20221222 latest working
+    container_name: deconz
+    network_mode: host
+    restart: always
+    volumes:
+      - $HOME/.trasba/docker/deconz/data:/opt/deCONZ
+    # - $HOME/.trasba/docker/deconz/xx:/root/.local/share/dresden-elektronik/deCONZ
+    # - $HOME/.trasba/docker/deconz/otau:/root/otau
+    devices:
+      - /dev/ttyACM0
+    environment:
+      - DECONZ_WEB_PORT=${WEB_PORT}
+      - DECONZ_WS_PORT=50443
+      - DEBUG_INFO=1
+      - DEBUG_APS=0
+      - DEBUG_ZCL=0
+      - DEBUG_ZDP=0
+      - DEBUG_OTAU=0
+      # - DECONZ_VNC_MODE=1
+      # - DECONZ_VNC_PORT=5901
+      - TZ=${TZ}
