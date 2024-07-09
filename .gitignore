@@ -13,3 +13,6 @@
 /wiki_js/data
 /prometheus/data
 /prometheus/node-exporter
+
+# sensibel config files
+/mqtt/config/mosquitto.conf
