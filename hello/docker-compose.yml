@@ -7,4 +7,4 @@ services:
     image: nginxdemos/hello:latest
     restart: unless-stopped
     ports:
-      - 80:80
+      - "${PORT:-80}:80"
