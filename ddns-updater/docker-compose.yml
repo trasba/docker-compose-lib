@@ -1,0 +1,16 @@
+services:
+  ddns-updater:
+    image: qmcgaw/ddns-updater:latest
+    container_name: ddns-updater
+    restart: always
+    volumes:
+      - /home/${USER}/.trasba/docker/ddns-updater/data:/updater/data
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    networks:
+      - caddy
+
+networks:
+    caddy:
+      name: caddy
+      external: true
