@@ -25,5 +25,5 @@ services:
 
 networks:
     caddy:
-      name: caddy
+      name: ${CADDY_NET}
       external: true
