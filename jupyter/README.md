@@ -1,21 +1,27 @@
-# <service>
+# Caddyfile
 
-TODO
+```
+# Define a matcher for allowed IP ranges (LAN and Tailscale)
+(local_net) {
+    @local_subnet {
+#          remote_ip ::/0 # make public
+          remote_ip 2a02::1/64
+          remote_ip 192.168.0.0/24
+          remote_ip 100.64.0.0/10  # Tailscale IP range
+	  remote_ip 2a03::1 # additional servers
+    }
+}
 
-#
-
-## Instructions
-
-- clone <service> folder to machine:  
-  `svn checkout https://github.com/trasba/docker-compose-lib/trunk/<service> `  
-  install subversion (svn) if necessary `sudo apt install subversion`
-- create & adjust .env file from .env.example
-- startup container
-  `docker-compose up -d`
-- (optional) TODO
-
-#
-
-## Hints
-
-shared folder `~/.trasba/docker/jupyter` has to be owned by 1000:1000
+# code-server
+jp.{$SITE_HOSTNAME} {
+	import local_net
+		handle @local_subnet {	        
+			route {
+				reverse_proxy jupyter:8888
+			}
+	}
+	handle {
+		respond "Access Denied" 403
+	}
+}
+```
