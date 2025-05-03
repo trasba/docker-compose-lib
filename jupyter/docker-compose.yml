@@ -4,7 +4,7 @@ services:
     image: jupyter/scipy-notebook:latest
     container_name: jupyter
     volumes:
-      - "/home/${USER:-trasba}/.trasba/docker/jupyter/home:/home/jovyan
+      - "/home/${USER:-trasba}/.trasba/docker/jupyter/home:/home/jovyan"
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
