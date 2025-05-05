@@ -4,7 +4,7 @@ services:
     container_name: ddns-updater
     restart: always
     volumes:
-      - /home/${USER}/.trasba/docker/ddns-updater/data:/updater/data
+      - /home/${USER:-trasba}/.trasba/docker/ddns-updater/data:/updater/data
       - "/etc/timezone:/etc/timezone:ro"
       - "/etc/localtime:/etc/localtime:ro"
     networks:
