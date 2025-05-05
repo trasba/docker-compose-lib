@@ -1,0 +1,26 @@
+services:
+  vikunja:
+    image: vikunja/vikunja
+    container_name: vikunia
+    environment:
+      VIKUNJA_SERVICE_JWTSECRET: ${TOKEN}
+      VIKUNJA_SERVICE_PUBLICURL: ${URL}
+      # Note the default path is /app/vikunja/vikunja.db.
+      # This config variable moves it to a different folder so you can use a volume and 
+      # store the database file outside the container so state is persisted even if the container is destroyed.
+      VIKUNJA_DATABASE_PATH: /db/vikunja.db
+    ports:
+      # - 3456:3456
+    volumes:
+      - /home/${USER:-trasba}/.trasba/docker/vikunia/files:/app/vikunja/files
+      - /home/${USER:-trasba}/.trasba/docker/vikunia/db:/db
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    restart: unless-stopped
+    networks:
+      - caddy
+
+networks:
+    caddy:
+      name: caddy
+      external: true
