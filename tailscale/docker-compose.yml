@@ -1,0 +1,19 @@
+services:
+  tailscale-subnet-router:
+    image: tailscale/tailscale:latest
+    container_name: tailscale
+    environment:
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_HOSTNAME=${TS_HOSTNAME} # The hostname this node will have in Headscale
+      - TS_ROUTES=${TS_ROUTES} # Replace with the subnet you want to route (your local LAN subnet on the RPi)
+      - TS_ACCEPT_ROUTES=${TS_ACCEPT_ROUTES:-false} # Accept routes advertised by other nodes
+      - TS_ACCEPT_DNS=${TS_ACCEPT_DNS:-false} # Set to true if you want to accept DNS settings from Headscale
+      - TS_EXTRA_ARGS=--login-server=${LOGIN_SERVER} # Replace with your Headscale server address and port (e.g., 192.168.1.100:443)
+    volumes:
+      - /home/${USER:-trasba}/.trasba/docker/tailscale/data:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun # Required for Tailscale's network interface
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    network_mode: host
+    privileged: true # Required for creating network interfaces and managing routes
+    restart: unless-stopped

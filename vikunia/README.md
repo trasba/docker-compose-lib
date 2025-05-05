@@ -1,3 +1,5 @@
+# Caddyfile
+
 ```
 # Define a matcher for allowed IP ranges (LAN and Tailscale)
 (local_net) {
