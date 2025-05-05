@@ -5,6 +5,7 @@ services:
     environment:
       VIKUNJA_SERVICE_JWTSECRET: ${TOKEN}
       VIKUNJA_SERVICE_PUBLICURL: ${URL}
+      VIKUNJA_SERVICE_ENABLEREGISTRATION: ${ENABLEREGISTRATION:-false}
       # Note the default path is /app/vikunja/vikunja.db.
       # This config variable moves it to a different folder so you can use a volume and 
       # store the database file outside the container so state is persisted even if the container is destroyed.
