@@ -1,0 +1,28 @@
+services:
+  raspberrymatic:
+    image: ghcr.io/jens-maus/raspberrymatic:latest
+    container_name: ccu
+    hostname: ccu
+    privileged: true
+    restart: unless-stopped
+    stop_grace_period: 30s
+    volumes:
+      - "/home/${USER:-trasba}/.trasba/docker/raspberrymatic/data:/usr/local:rw"
+      - /lib/modules:/lib/modules:ro
+      - /run/udev/control:/run/udev/control
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    networks:
+      ccu:
+        ipv4_address: ${IPADDRESS}
+
+networks:
+  ccu:
+    name: ccu
+    driver: ipvlan
+    driver_opts:
+      parent: ${INTERFACE}
+    ipam:
+      config:
+        - subnet: ${SUBNET}
+          gateway: ${GATEWAY}
