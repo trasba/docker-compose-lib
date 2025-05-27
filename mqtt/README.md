@@ -25,7 +25,7 @@ log_dest file /mosquitto/log/mosquitto.log
 # log_type error
 # log_type warning
 # log_type notice
-# log_type info
+# log_type information
 # log_type subscribe
 # log_type unsubscribe
 # log_type websockets
