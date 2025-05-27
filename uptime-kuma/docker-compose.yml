@@ -1,6 +1,6 @@
 services:
   uptime-kuma:
-    image: louislam/uptime-kuma:base2
+    image: louislam/uptime-kuma:latest
     container_name: uptime-kuma
     restart: always
     volumes:
