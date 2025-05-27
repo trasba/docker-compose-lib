@@ -3,12 +3,15 @@ services:
     image: eclipse-mosquitto:2 ###240530
     container_name: mqtt
     ports:
-      - ${TCP_01}:${TCP_01}
-    #          - ${TCP_02}
+      - ${TCP_01:-1883}:${TCP_01:-1883}
     volumes:
-      - $HOME/.trasba/docker/mqtt/data:/mosquitto/data
-      - $HOME/.trasba/docker/mqtt/config:/mosquitto/config
-      - $HOME/.trasba/docker/mqtt/log:/mosquitto/log
+      - /home/${USER:-trasba}/.trasba/docker/mqtt/data:/mosquitto/data
+      - /home/${USER:-trasba}/.trasba/docker/mqtt/config:/mosquitto/config
+      - /home/${USER:-trasba}/.trasba/docker/mqtt/log:/mosquitto/log
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
     restart: always
-    environment:
-      - TZ=${TZ}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
