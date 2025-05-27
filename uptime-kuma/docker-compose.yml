@@ -1,0 +1,16 @@
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:base2-slim
+    container_name: uptime-kuma
+    restart: always
+    volumes:
+      - /home/${USER:-trasba}/.trasba/uptime-kuma/data:/app/data
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    networks:
+      - caddy
+
+networks:
+    caddy:
+      name: caddy
+      external: true
