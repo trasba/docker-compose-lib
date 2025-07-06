@@ -1,7 +1,8 @@
 ---
 services:
   jupyter:
-    image: jupyter/scipy-notebook:latest
+    # build: . # this seems to not work with portainer
+    image: trasba/scipy-notebook:latest
     container_name: jupyter
     volumes:
       - "/home/${USER:-trasba}/.trasba/docker/jupyter/home:/home/jovyan"

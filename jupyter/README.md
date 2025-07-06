@@ -25,3 +25,9 @@ jp.{$SITE_HOSTNAME} {
 	}
 }
 ```
+
+# Build docker image
+
+It is assumed that you build the image with the Dockerfile provided.  
+You can e.g. build it with portainer using this url: `https://raw.githubusercontent.com/trasba/docker-compose-lib/refs/heads/main/jupyter/Dockerfile`  
+Make sure the tag `trasba/scipy-notebook:latest` is correct
