@@ -1,0 +1,24 @@
+# prometheus.yml (example)
+
+```
+global:
+  scrape_interval: 1m
+
+scrape_configs:
+  - job_name: 'prometheus'
+    scrape_interval: 1m
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'node'
+    static_configs:
+      - targets: ['<node-exporter-ip>:9100']
+```
+
+the section to pull the node-exporter data is 
+
+```
+  - job_name: 'node'
+    static_configs:
+      - targets: ['<node-exporter-ip>:9100']
+```

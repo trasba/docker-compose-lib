@@ -1,0 +1,22 @@
+services:
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: node_exporter
+    restart: unless-stopped
+    
+    # CRITICAL: Use the host's network and process space to monitor the host OS
+    network_mode: host
+    pid: host
+    
+    # CRITICAL: Mount host directories for metrics access.
+    # The --path.rootfs=/host argument tells node_exporter where to find the host filesystem.
+    volumes:
+      - /:/host:ro,rslave # Mounts the host's root filesystem (read-only)
+      - /sys:/sys:ro       # Mounts /sys for hardware/kernel info
+      - /proc:/proc:ro     # Mounts /proc for process and system stats
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+      
+    # Pass the argument to Node Exporter to look at the mounted host filesystem
+    command:
+      - '--path.rootfs=/host'
