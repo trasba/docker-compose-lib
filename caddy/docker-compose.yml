@@ -1,0 +1,29 @@
+services:
+  caddy:
+    image: caddy:2
+    container_name: caddy
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # - /home/${USER}/.trasba/docker/caddy/caddy_sec:/usr/bin/caddy # needs to be manually added
+      - /home/${USER:-trasba}/.trasba/docker/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - /home/${USER:-trasba}/.trasba/docker/caddy/data:/data
+      - /home/${USER:-trasba}/.trasba/docker/caddy/config:/config
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    environment:
+      # - JWT_SHARED_KEY=${JWT_SHARED_KEY}
+      # - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      # - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - SITE_HOSTNAME=${SITE_HOSTNAME}
+    networks:
+      - caddy
+
+networks:
+    caddy:
+      name: caddy
+      enable_ipv6: true
