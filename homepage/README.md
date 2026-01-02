@@ -21,7 +21,7 @@ hp.{$SITE_HOSTNAME} {
 			}
 	}
 	handle {
-		respond "Access Denied" 403
+		respond "Access Denied. Your IP address is: {http.request.remote.host}" 403
 	}
 }
 ```
@@ -40,7 +40,7 @@ my-docker:
   port: 2375
 ```
 
-## config/docker.yaml
+## config/services.yaml
 
 ```
 ---
@@ -51,7 +51,7 @@ my-docker:
     - Public Services :
         - jellyfin:
             icon: https://cdn.jsdelivr.net/gh/selfhst/icons/svg/jellyfin.svg
-            href: https://jf.kapi6.t00s.de/
+            href: https://my-homepage.com/
             server: my-docker
             container: jellyfin
 		- ...
