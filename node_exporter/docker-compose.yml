@@ -10,13 +10,14 @@ services:
     
     # CRITICAL: Mount host directories for metrics access.
     # The --path.rootfs=/host argument tells node_exporter where to find the host filesystem.
+    # Volumes changed to avoid the /proc conflict
     volumes:
       - /:/host:ro,rslave # Mounts the host's root filesystem (read-only)
-      - /sys:/sys:ro       # Mounts /sys for hardware/kernel info
-      - /proc:/proc:ro     # Mounts /proc for process and system stats
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
+      - /sys:/host/sys:ro       # Mounts /sys for hardware/kernel info
+      - /proc:/host/proc:ro     # Mounts /proc for process and system stats
       
     # Pass the argument to Node Exporter to look at the mounted host filesystem
     command:
       - '--path.rootfs=/host'
+      - '--path.sysfs=/host/sys'
+      - '--path.procfs=/host/proc'
