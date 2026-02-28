@@ -1,0 +1,19 @@
+services:
+  pgadmin:
+    image: dpage/pgadmin4:9
+    container_name: pgadmin
+    restart: always
+    volumes:
+      - /home/${USER:-trasba}/.trasba/docker/pgadmin/data:/var/lib/pgadmin
+    environment:
+      - TZ=${TZ:-Europe/Berlin}
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PW}
+    networks:
+      - caddy
+
+networks:
+    caddy:
+      name: ${CADDY_NETWORK:-caddy}
+      external: true
+
