@@ -1,19 +1,37 @@
 services:
   tailscale-subnet-router:
     image: tailscale/tailscale:latest
-    container_name: tailscale
+    container_name: ${TS_CONTAINER_NAME:-tailscale-subnet-router}
+    hostname: ${TS_HOSTNAME}
     environment:
       - TS_STATE_DIR=/var/lib/tailscale
-      - TS_HOSTNAME=${TS_HOSTNAME} # The hostname this node will have in Headscale
-      - TS_ROUTES=${TS_ROUTES} # Replace with the subnet you want to route (your local LAN subnet on the RPi)
-      - TS_ACCEPT_ROUTES=${TS_ACCEPT_ROUTES:-false} # Accept routes advertised by other nodes
-      - TS_ACCEPT_DNS=${TS_ACCEPT_DNS:-false} # Set to true if you want to accept DNS settings from Headscale
-      - TS_EXTRA_ARGS=${TS_EXTRA_ARGS} # Replace with your Headscale server address and port (e.g., 192.168.1.100:443)
+      - TS_HOSTNAME=${TS_HOSTNAME}
+      - TS_ROUTES=${TS_ROUTES:-}
+      - TS_ACCEPT_ROUTES=${TS_ACCEPT_ROUTES:-false}
+      - TS_ACCEPT_DNS=${TS_ACCEPT_DNS:-false}
+      - TS_USERSPACE=${TS_USERSPACE:-false}
+      - TS_DEBUG_FIREWALL_MODE=${TS_DEBUG_FIREWALL_MODE:-nftables}
+      - TS_EXTRA_ARGS=--login-server=${TS_LOGIN_SERVER} --stateful-filtering=false ${TS_EXTRA_ARGS:-}
+      - TS_DEST_IP=${TS_DEST_IP:-}
+      # State-of-the-art timezone injection
+      - TZ=${TZ:-Europe/Berlin}
     volumes:
-      - /home/${USER:-trasba}/.trasba/docker/tailscale/data:/var/lib/tailscale
-      - /dev/net/tun:/dev/net/tun # Required for Tailscale's network interface
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
-    network_mode: host
-    privileged: true # Required for creating network interfaces and managing routes
+      - ${TS_DATA_DIR:-/home/${USER:-trasba}/.trasba/docker/tailscale/data}:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+      - /lib/modules:/lib/modules:ro
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv6.conf.all.forwarding=1
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    privileged: false
     restart: unless-stopped
+    networks:
+      - tailscale_bridge
+
+networks:
+  tailscale_bridge:
+    name: tailscale_bridge
+    driver: bridge
+    enable_ipv6: true
