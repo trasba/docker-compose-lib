@@ -1,0 +1,14 @@
+services:
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: ${JELLYFIN_CONTAINER_NAME:-jellyfin}
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-Europe/Berlin}
+      - JELLYFIN_PublishedServerUrl=${JELLYFIN_PUBLISHED_SERVER_URL:-}
+    volumes:
+      - ${JELLYFIN_CONFIG_DIR:-/home/${USER:-trasba}/.trasba/docker/jellyfin/config}:/config
+      - ${JELLYFIN_MEDIA_DIR:-/home/${USER:-trasba}/.trasba/docker/jellyfin/media}:/data
+    restart: unless-stopped
+
